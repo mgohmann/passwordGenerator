@@ -7,12 +7,12 @@ param vaultName string
 @description('Required. Secret name.')
 param secretName string
 
-@description('Secure String Length')
+@description('Required. Password length from 16 to 128 characters.')
 @minValue(16)
 @maxValue(128)
-param length int = 30
+param length int
 
-@description('Optional. Customize the special character set. Use when a particular service/system cannot use certain special characters.')
+@description('Optional. Used to customize the special characters when a particular service/system cannot use certain special characters. Default special characters are: "!#$%&()*+,-./<=>?@[]^_"')
 param specialCharSet string = '!#$%&()*+,-./<=>?@[]^_'
 
 @description('Optional. Set whether every character type (uppercase, lowercase, numbers, and special characters) is required.')
