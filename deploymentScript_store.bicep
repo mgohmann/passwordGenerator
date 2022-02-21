@@ -4,18 +4,22 @@ targetScope = 'resourceGroup'
 param vaultName string
 
 @secure()
+@description('Required. Secret name.')
 param secretName string
 
-@description('Password Length')
+@description('Secure String Length')
+@minValue(16)
+@maxValue(128)
 param length int = 30
 
-@description('Customize the special character set.1')
+@description('Optional. Customize the special character set. Use when a particular service/system cannot use certain special characters.')
 param specialCharSet string = '!#$%&()*+,-./<=>?@[]^_'
 
-@description('Optional. Leave blank for utcNow().')
-param timestamp string = utcNow()
+@description('Optional. Set whether every character type (uppercase, lowercase, numbers, and special characters) is required.')
+param mustUseEveryCharType bool = true
 
-var identity = 'identity'
+@description('Optional. Leave blank. Used to force the deployment script to run on demand.')
+param timestamp string = utcNow()
 
 resource pwsh 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
   name: 'pwsh'
@@ -34,7 +38,7 @@ resource pwsh 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
     timeout: 'PT2M' // timeout in 2 min
     forceUpdateTag: timestamp // script will run every time
     cleanupPreference: 'Always'
-    arguments: '-length ${length} -specialCharSet ${specialCharSet} -vaultName ${vaultName} -keyName ${secretName}'
+    arguments: '-length ${length} -specialCharSet ${specialCharSet} -vaultName ${vaultName} -keyName ${secretName} -mustUseEveryCharType ${mustUseEveryCharType}'
     scriptContent: '''
     param ([ValidateRange(16, 128)][int]$length = 30, [bool]$mustUseEveryCharType = $true, [string]$specialCharSet = '!#$%&()*+,-./<=>?@[]^_', [string]$vaultName, [string]$keyName)
     [string]$charSet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' + $specialCharSet
